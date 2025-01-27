@@ -2,8 +2,9 @@ import { useState } from 'react';
 import GameBoard from './components/gameBoard';
 import Player from './components/player';
 import Log from './components/Log';
-import { WINNING_COMBINATIONS } from './components/WinningCombination';
 import GameOver from './components/GameOver';
+
+const IS_LOG_ENABLED = false;
 
 const initialGameBoard = [
   [null, null, null, null, null],
@@ -71,42 +72,44 @@ function App() {
     setGameTurns([]);
   }
   return (
-    <main>
-      <div id="game-container">
-        <ol
-          id="players"
-          className="highlight-player"
-        >
-          <Player
-            name="Player1"
-            symbol="C"
-            isActive={activePlayer === 'C'}
+    <>
+      <main>
+        <div id="game-container">
+          <ol
+            id="players"
+            className="highlight-player"
+          >
+            <Player
+              name="Player1"
+              symbol="C"
+              isActive={activePlayer === 'C'}
+            />
+            <Player
+              name="Player2"
+              symbol="M"
+              isActive={activePlayer === 'M'}
+            />
+            <Player
+              name="Player3"
+              symbol="T"
+              isActive={activePlayer === 'T'}
+            />
+          </ol>
+          {(winner || hasEnd) && (
+            <GameOver
+              winner={winner}
+              onRestart={handleRestart}
+            />
+          )}
+          <GameBoard
+            onSelectSquare={handleSelectSquare}
+            activePlayerSymbol={activePlayer}
+            board={gameBoard}
           />
-          <Player
-            name="Player2"
-            symbol="M"
-            isActive={activePlayer === 'M'}
-          />
-          <Player
-            name="Player3"
-            symbol="T"
-            isActive={activePlayer === 'T'}
-          />
-        </ol>
-        {(winner || hasEnd) && (
-          <GameOver
-            winner={winner}
-            onRestart={handleRestart}
-          />
-        )}
-        <GameBoard
-          onSelectSquare={handleSelectSquare}
-          activePlayerSymbol={activePlayer}
-          board={gameBoard}
-        />
-      </div>
-      {/* <Log logs={gameTurns} /> */}
-    </main>
+        </div>
+        {IS_LOG_ENABLED && <Log logs={gameTurns} />}
+      </main>
+    </>
   );
 }
 
