@@ -48,7 +48,7 @@ h1 {
 }
 
 #game-container {
-  max-width: 45rem;
+  max-width: 30rem;
   margin: 3rem auto;
   padding: 2rem;
   border-radius: 6px;
@@ -64,13 +64,13 @@ h1 {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
 }
 
 #players li {
   display: flex;
   align-items: center;
-  width: 50%;
+  width: 20%;
   border: 2px solid transparent;
 }
 
@@ -85,7 +85,7 @@ h1 {
 }
 
 #players button {
-  width: 3rem;
+  width: 5rem;
   border: none;
   background: none;
   color: #c3ba78;
@@ -109,21 +109,21 @@ h1 {
 
 .player-name {
   display: inline-block;
-  width: 10rem;
-  font-size: 1rem;
+  width: 3rem;
+  font-size: .8rem;
   color: #e1dec7;
   text-transform: uppercase;
   margin: 0;
-  padding: 0.5rem;
-  border-radius: 4px;
+  padding: 0.1rem;
+  border-radius: 1px;
   text-overflow: ellipsis;
   text-align: center;
 }
 
 .player input {
   font: inherit;
-  font-size: 1rem;
-  width: 10rem;
+  font-size: .8rem;
+  width: 5rem;
   border: none;
   padding: 0.5rem;
   animation: pulse-text 2s infinite;
@@ -134,7 +134,7 @@ h1 {
 
 .player-symbol {
   margin-left: 1rem;
-  font-size: 1rem;
+  font-size: 2rem;
   color: #e1dec7;
 }
 
@@ -164,8 +164,8 @@ ol {
   flex-wrap: wrap;
   justify-content: center;
   gap: 2rem;
-  margin: 3rem 0;
   padding: 0;
+  margin-bottom: 1rem;
   flex-direction: column;
 }
 
@@ -173,21 +173,21 @@ ol {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 2rem;
-  margin: 0;
+  gap: .5rem;
+  margin-bottom: -1.5rem;
   padding: 0;
 }
 
 #game-board button {
-  width: 5rem;
-  height: 5rem;
+  width: 4rem;
+  height: 4rem;
   border: none;
   background: #aca788;
   color: #3f3b00;
   font-size: 5/8rem;
   cursor: pointer;
   font-family: 'Caprasimo', cursive;
-  padding: 1rem;
+  padding: 0rem;
 }
 
 #game-over {
