@@ -49,11 +49,6 @@ h1 {
   margin: 0 auto 3rem auto;
   color: #3f3b00;
 }
-/* #root{
-  display: flex;
-} */
-
-
 
 #game-container {
   max-width: 30rem;
@@ -200,7 +195,7 @@ ol {
   height: 4rem;
   border: none;
   background: #aca788;
-  color: #3f3b00;
+  color: #000000;
   font-size: 1.8rem;
   cursor: pointer;
   font-family: 'Caprasimo', cursive;
