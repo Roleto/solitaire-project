@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import GameBoard from './components/gameBoard';
-import Player from './components/player';
+import GameBoard from './components/GameBoard';
+import Player from './components/Player';
 import Log from './components/Log';
 import GameOver from './components/GameOver';
 
@@ -18,14 +18,16 @@ const initialGameBoard = [
 
 function deriveActivePlayer(gameTurns) {
   let curPlayer = 'C';
-  if (gameTurns.length > 0 && gameTurns[0].player === 'C') {
-    curPlayer = 'M';
-  }
-  if (gameTurns.length > 0 && gameTurns[0].player === 'M') {
-    curPlayer = 'T';
-  }
-  if (gameTurns.length > 0 && gameTurns[0].player === 'T') {
-    curPlayer = 'C';
+  if (gameTurns.length > 0) {
+    if (gameTurns[0].player === 'C') {
+      curPlayer = 'M';
+    }
+    if (gameTurns[0].player === 'M') {
+      curPlayer = 'T';
+    }
+    if (gameTurns[0].player === 'T') {
+      curPlayer = 'C';
+    }
   }
 
   return curPlayer;
@@ -56,7 +58,7 @@ function checkForAlign(rowIndex, colIndex, symbol, gameBoard) {
     { rowDir: -1, colDir: 1 },
     { rowDir: 0, colDir: -1 },
   ];
-  let curentIndex = {
+  let currentIndex = {
     rowIndex: rowIndex,
     colIndex: colIndex,
   };
@@ -64,13 +66,13 @@ function checkForAlign(rowIndex, colIndex, symbol, gameBoard) {
   do {
     if (isPositiveDir) {
       nextIndex = {
-        rowIndex: curentIndex.rowIndex + directions[curDirectionIndex].rowDir,
-        colIndex: curentIndex.colIndex + directions[curDirectionIndex].colDir,
+        rowIndex: currentIndex.rowIndex + directions[curDirectionIndex].rowDir,
+        colIndex: currentIndex.colIndex + directions[curDirectionIndex].colDir,
       };
     } else {
       nextIndex = {
-        rowIndex: curentIndex.rowIndex - directions[curDirectionIndex].rowDir,
-        colIndex: curentIndex.colIndex - directions[curDirectionIndex].colDir,
+        rowIndex: currentIndex.rowIndex - directions[curDirectionIndex].rowDir,
+        colIndex: currentIndex.colIndex - directions[curDirectionIndex].colDir,
       };
     }
     if (
@@ -79,7 +81,7 @@ function checkForAlign(rowIndex, colIndex, symbol, gameBoard) {
       nextIndex.colIndex < 0 ||
       nextIndex.colIndex > gameBoard[0].length - 1
     ) {
-      curentIndex = {
+      currentIndex = {
         rowIndex: rowIndex,
         colIndex: colIndex,
       };
@@ -100,9 +102,9 @@ function checkForAlign(rowIndex, colIndex, symbol, gameBoard) {
 
       if (nextBoard && nextBoard.symbol === symbol) {
         foundedIndexes = [{ row: nextIndex.rowIndex, col: nextIndex.colIndex }, ...foundedIndexes];
-        curentIndex = { ...nextIndex };
+        currentIndex = { ...nextIndex };
       } else {
-        curentIndex = {
+        currentIndex = {
           rowIndex: rowIndex,
           colIndex: colIndex,
         };
@@ -148,15 +150,15 @@ function App() {
   const hasEnd = gameTurns.length == 25;
 
   function changePrevTurns(prevTurns, indexes = [], newColor) {
-    let curPlayyer;
-    let winner = null;
+    let curPlayer;
+    let winnerSymbol = null;
     let output = [];
     for (let i = 0; i < prevTurns.length; i++) {
       const turn = prevTurns[i];
       // for (turn of prevTurns) {
       const findItem = indexes.find((index) => index.row == turn.square.row && index.col == turn.square.col);
       if (findItem) {
-        curPlayyer = turn.player;
+        curPlayer = turn.player;
         output = [
           ...output,
           {
@@ -169,12 +171,12 @@ function App() {
       }
     }
     if (indexes.length == 2) {
-      PlayerPoints[curPlayyer]++;
-      if (PlayerPoints[curPlayyer] == 3) {
-        winner = curPlayyer;
+      PlayerPoints[curPlayer]++;
+      if (PlayerPoints[curPlayer] == 3) {
+        winnerSymbol = curPlayer;
       }
     }
-    return { newLastTurns: output, winner: winner };
+    return { newLastTurns: output, winner: winnerSymbol };
   }
   function hasWinner(winner) {
     Winner = winner;
@@ -182,8 +184,8 @@ function App() {
   function handleSelectSquare(rowIndex, colIndex) {
     setGameTurns((prevTurns) => {
       const curPlayer = deriveActivePlayer(prevTurns);
-      const { square, founIndexes } = checkForAlign(rowIndex, colIndex, curPlayer, gameBoard);
-      let { newLastTurns, winner } = changePrevTurns([...prevTurns], founIndexes, square.color);
+      const { square, founIndexes: foundIndexes } = checkForAlign(rowIndex, colIndex, curPlayer, gameBoard);
+      let { newLastTurns, winner } = changePrevTurns([...prevTurns], foundIndexes, square.color);
       if (winner) {
         hasWinner(winner);
       }
