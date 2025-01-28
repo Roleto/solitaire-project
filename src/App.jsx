@@ -121,7 +121,6 @@ function checkForAlign(rowIndex, colIndex, symbol, gameBoard) {
       }
     }
   } while (curDirectionIndex < directions.length);
-  console.log(outputIndexes.length);
   if (outputIndexes.length < 2) {
     return { square: { row: rowIndex, col: colIndex, color: 'default' }, founIndexes: [] };
   } else {
