@@ -85,6 +85,11 @@ function checkForAlign(rowIndex, colIndex, symbol, gameBoard) {
       };
       if (isPositiveDir) {
         isPositiveDir = false;
+      } else if (foundedIndexes.length >= 2) {
+        outputIndexes = [...outputIndexes, ...foundedIndexes];
+        isPositiveDir = true;
+        curDirectionIndex++;
+        foundedIndexes = [];
       } else {
         isPositiveDir = true;
         curDirectionIndex++;
@@ -92,6 +97,7 @@ function checkForAlign(rowIndex, colIndex, symbol, gameBoard) {
       }
     } else {
       const nextBoard = gameBoard[nextIndex.rowIndex][nextIndex.colIndex];
+
       if (nextBoard && nextBoard.symbol === symbol) {
         foundedIndexes = [{ row: nextIndex.rowIndex, col: nextIndex.colIndex }, ...foundedIndexes];
         curentIndex = { ...nextIndex };
@@ -115,6 +121,7 @@ function checkForAlign(rowIndex, colIndex, symbol, gameBoard) {
       }
     }
   } while (curDirectionIndex < directions.length);
+  console.log(outputIndexes.length);
   if (outputIndexes.length < 2) {
     return { square: { row: rowIndex, col: colIndex, color: 'default' }, founIndexes: [] };
   } else {
@@ -178,7 +185,6 @@ function App() {
       const curPlayer = deriveActivePlayer(prevTurns);
       const { square, founIndexes } = checkForAlign(rowIndex, colIndex, curPlayer, gameBoard);
       let { newLastTurns, winner } = changePrevTurns([...prevTurns], founIndexes, square.color);
-      // console.log(winner);
       if (winner) {
         hasWinner(winner);
       }
