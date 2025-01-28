@@ -4,8 +4,9 @@ import Player from './components/player';
 import Log from './components/Log';
 import GameOver from './components/GameOver';
 
-const IS_LOG_ENABLED = true;
+const IS_LOG_ENABLED = false;
 let PlayerPoints = {};
+let Winner = null;
 
 const initialGameBoard = [
   [null, null, null, null, null],
@@ -61,7 +62,6 @@ function checkForAlign(rowIndex, colIndex, symbol, gameBoard) {
   };
   let nextIndex = {};
   do {
-    // console.log(curentIndex);
     if (isPositiveDir) {
       nextIndex = {
         rowIndex: curentIndex.rowIndex + directions[curDirectionIndex].rowDir,
@@ -75,9 +75,9 @@ function checkForAlign(rowIndex, colIndex, symbol, gameBoard) {
     }
     if (
       nextIndex.rowIndex < 0 ||
-      nextIndex.rowIndex > gameBoard.length ||
+      nextIndex.rowIndex > gameBoard.length - 1 ||
       nextIndex.colIndex < 0 ||
-      nextIndex.colIndex > gameBoard[0].length
+      nextIndex.colIndex > gameBoard[0].length - 1
     ) {
       curentIndex = {
         rowIndex: rowIndex,
@@ -93,14 +93,13 @@ function checkForAlign(rowIndex, colIndex, symbol, gameBoard) {
     } else {
       const nextBoard = gameBoard[nextIndex.rowIndex][nextIndex.colIndex];
       if (nextBoard && nextBoard.symbol === symbol) {
+        foundedIndexes = [{ row: nextIndex.rowIndex, col: nextIndex.colIndex }, ...foundedIndexes];
         curentIndex = { ...nextIndex };
-        foundedIndexes = [{ row: nextIndex.rowIndex, col: nextIndex.rowIndex }, ...foundedIndexes];
       } else {
         curentIndex = {
           rowIndex: rowIndex,
           colIndex: colIndex,
         };
-        // console.log(foundedIndexes.length);
         if (isPositiveDir) {
           isPositiveDir = false;
         } else if (foundedIndexes.length >= 2) {
@@ -119,97 +118,12 @@ function checkForAlign(rowIndex, colIndex, symbol, gameBoard) {
   if (outputIndexes.length < 2) {
     return { square: { row: rowIndex, col: colIndex, color: 'default' }, founIndexes: [] };
   } else {
-    // console.log(gameBoard[rowIndex][colIndex].symbol);
-    // const valami = {
-    //   square: { row: rowIndex, col: colIndex, color: switchColor(symbol) },
-    //   founIndexes: outputIndexes,
-    // };
-    // console.log(valami);
     return {
       square: { row: rowIndex, col: colIndex, color: switchColor(symbol) },
       founIndexes: outputIndexes,
     };
   }
 }
-// function checkForAlign2(gameBoard) {
-//   let tulfutgatlo = 0;
-//   const directions = [
-//     { rowDir: -1, colDir: -1 },
-//     { rowDir: -1, colDir: 0 },
-//     { rowDir: -1, colDir: 1 },
-//     { rowDir: 0, colDir: -1 },
-//   ];
-//   for (let i = 0; i < gameBoard.length; i++) {
-//     for (let y = 0; y < gameBoard[0].length; y++) {
-//       let counter = 0;
-//       dolog = [];
-//       dologN = 0;
-//       if (gameBoard[i][y] == null || gameBoard[i][y].color != 'default') {
-//         continue;
-//       }
-//       let currentPos = { row: i, col: y };
-
-//       for (let index = 0; index < directions.length; index++) {
-//         const { rowDir, colDir } = directions[index];
-//         do {
-//           tulfutgatlo++;
-//           if (
-//             currentPos.row + rowDir < 0 ||
-//             currentPos.row + rowDir > 4 ||
-//             currentPos.col + colDir < 0 ||
-//             currentPos.col + colDir > 4
-//           ) {
-//             break;
-//           }
-//           let nextSymbolPos = { row: currentPos.row + rowDir, col: currentPos.col + colDir };
-//           if (
-//             gameBoard[nextSymbolPos.row][nextSymbolPos.col] &&
-//             gameBoard[nextSymbolPos.row][nextSymbolPos.col].symbol === gameBoard[i][y].symbol
-//           ) {
-//             currentPos = { row: nextSymbolPos.row, col: nextSymbolPos.col };
-//             dologN++;
-//             counter++;
-//           } else {
-//             break;
-//           }
-//         } while (tulfutgatlo < 30 && counter < 3);
-//         if (counter > 2) {
-//           switchColor(gameBoard);
-//           break;
-//         }
-//         currentPos = { row: i, col: y };
-//         tulfutgatlo = 0;
-//         do {
-//           tulfutgatlo++;
-//           if (
-//             currentPos.row - rowDir < 0 ||
-//             currentPos.row - rowDir > 4 ||
-//             currentPos.col - colDir < 0 ||
-//             currentPos.col - colDir > 4
-//           ) {
-//             break;
-//           }
-//           let nextSymbolPos = { row: currentPos.row - rowDir, col: currentPos.col - colDir };
-//           if (
-//             gameBoard[nextSymbolPos.row][nextSymbolPos.col] &&
-//             gameBoard[nextSymbolPos.row][nextSymbolPos.col].symbol === gameBoard[i][y].symbol
-//           ) {
-//             currentPos = { row: nextSymbolPos.row, col: nextSymbolPos.col };
-//             dolog[dologN] = gameBoard[nextSymbolPos.row][nextSymbolPos.col];
-//             dologN++;
-//             counter++;
-//           } else {
-//             break;
-//           }
-//         } while (tulfutgatlo < 30 && counter < 3);
-
-//         if (counter > 2) {
-//           switchColor(gameBoard);
-//         }
-//       }
-//     }
-//   }
-// }
 
 function App() {
   const [gameTurns, setGameTurns] = useState([]);
@@ -228,12 +142,15 @@ function App() {
   const hasEnd = gameTurns.length == 25;
 
   function changePrevTurns(prevTurns, indexes = [], newColor) {
+    let curPlayyer;
+    let winner = null;
     let output = [];
     for (let i = 0; i < prevTurns.length; i++) {
-      // for (turn of prevTurns) {
       const turn = prevTurns[i];
+      // for (turn of prevTurns) {
       const findItem = indexes.find((index) => index.row == turn.square.row && index.col == turn.square.col);
       if (findItem) {
+        curPlayyer = turn.player;
         output = [
           ...output,
           {
@@ -245,17 +162,26 @@ function App() {
         output = [...output, turn];
       }
     }
-    return output;
+    if (indexes.length == 2) {
+      PlayerPoints[curPlayyer]++;
+      if (PlayerPoints[curPlayyer] == 3) {
+        winner = curPlayyer;
+      }
+    }
+    return { newLastTurns: output, winner: winner };
   }
-
+  function hasWinner(winner) {
+    Winner = winner;
+  }
   function handleSelectSquare(rowIndex, colIndex) {
     setGameTurns((prevTurns) => {
       const curPlayer = deriveActivePlayer(prevTurns);
       const { square, founIndexes } = checkForAlign(rowIndex, colIndex, curPlayer, gameBoard);
-      let newLastTurns = changePrevTurns([...prevTurns], founIndexes, square.color);
-      // if (founIndexes.length >= 2) {
-      //   console.log(newLastTurns);
-      // }
+      let { newLastTurns, winner } = changePrevTurns([...prevTurns], founIndexes, square.color);
+      // console.log(winner);
+      if (winner) {
+        hasWinner(winner);
+      }
       const copyTurn = [
         {
           square: square,
@@ -269,8 +195,9 @@ function App() {
   function handleRestart() {
     InitilizePoints();
     setGameTurns([]);
+    Winner = null;
   }
-  let winner = false;
+  function winCondition() {}
   return (
     <>
       <main>
@@ -295,9 +222,9 @@ function App() {
               isActive={activePlayer === 'T'}
             />
           </ol>
-          {(winner || hasEnd) && (
+          {(Winner || hasEnd) && (
             <GameOver
-              winner={winner}
+              winner={Winner}
               onRestart={handleRestart}
             />
           )}
