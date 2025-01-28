@@ -203,7 +203,6 @@ function App() {
     setGameTurns([]);
     Winner = null;
   }
-  function winCondition() {}
   return (
     <>
       <main>
@@ -240,6 +239,12 @@ function App() {
             board={gameBoard}
             turns={gameTurns}
           />
+          <button
+            id="restart-button"
+            onClick={handleRestart}
+          >
+            Restart
+          </button>
         </div>
         {IS_LOG_ENABLED && <Log logs={gameTurns} />}
       </main>

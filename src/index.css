@@ -243,6 +243,19 @@ ol {
   transition: all 0.2s, color 0.2s;
   box-shadow: 0 0 8px rgba(255, 187, 0, 0.4);
 }
+#restart-button{
+  display: block;
+  margin: 0 auto;
+  font-size: 1.5rem;
+  background: none;
+  border: 2px solid #fcd256;
+  color: #fcd256;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s, color 0.2s;
+  box-shadow: 0 0 8px rgba(255, 187, 0, 0.4);
+}
 
 #game-over button:hover {
   background: #fcd256;
