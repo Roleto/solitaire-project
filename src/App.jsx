@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import GameBoard from './components/gameBoard';
-import Player from './components/player';
 import Log from './components/Log';
 import GameOver from './components/GameOver';
+import Player from './components/Player';
 
 const IS_LOG_ENABLED = false;
-let PlayerPoints = {};
-let Winner = null;
+let playerPoints = {};
+let activePlayer = 'C';
 
 const initialGameBoard = [
   [null, null, null, null, null],
@@ -31,9 +31,9 @@ function deriveActivePlayer(gameTurns) {
   return curPlayer;
 }
 function InitilizePoints() {
-  PlayerPoints['C'] = 0;
-  PlayerPoints['M'] = 0;
-  PlayerPoints['T'] = 0;
+  playerPoints['C'] = 0;
+  playerPoints['M'] = 0;
+  playerPoints['T'] = 0;
 }
 function switchColor(symbol) {
   if (symbol == 'C') {
@@ -121,7 +121,6 @@ function checkForAlign(rowIndex, colIndex, symbol, gameBoard) {
       }
     }
   } while (curDirectionIndex < directions.length);
-  console.log(outputIndexes.length);
   if (outputIndexes.length < 2) {
     return { square: { row: rowIndex, col: colIndex, color: 'default' }, founIndexes: [] };
   } else {
@@ -133,20 +132,24 @@ function checkForAlign(rowIndex, colIndex, symbol, gameBoard) {
 }
 
 function App() {
-  const [gameTurns, setGameTurns] = useState([]);
-  let activePlayer = deriveActivePlayer(gameTurns);
+  const [gameTurnState, setGameTurnState] = useState([]);
+  const [winner, setWinner] = useState(null);
   useEffect(() => {
     InitilizePoints();
   }, []);
 
+  useEffect(() => {
+    activePlayer = deriveActivePlayer(gameTurnState);
+  }, [gameTurnState]);
+
   let gameBoard = [...initialGameBoard.map((innerArray) => [...innerArray])];
-  for (const turn of gameTurns) {
+  for (const turn of gameTurnState) {
     const { square, player } = turn;
     const { row, col, color } = square;
 
     gameBoard[row][col] = { symbol: player, color: color };
   }
-  const hasEnd = gameTurns.length == 25;
+  const hasEnd = gameTurnState.length == 25;
 
   function changePrevTurns(prevTurns, indexes = [], newColor) {
     let curPlayyer;
@@ -170,23 +173,24 @@ function App() {
       }
     }
     if (indexes.length == 2) {
-      PlayerPoints[curPlayyer]++;
-      if (PlayerPoints[curPlayyer] == 3) {
+      playerPoints[curPlayyer]++;
+      if (playerPoints[curPlayyer] == 3) {
         winner = curPlayyer;
       }
     }
     return { newLastTurns: output, winner: winner };
   }
-  function hasWinner(winner) {
-    Winner = winner;
-  }
+  // function hasWinner(winner) {
+  //   winner = winner;
+  // }
   function handleSelectSquare(rowIndex, colIndex) {
-    setGameTurns((prevTurns) => {
+    setGameTurnState((prevTurns) => {
       const curPlayer = deriveActivePlayer(prevTurns);
-      const { square, founIndexes } = checkForAlign(rowIndex, colIndex, curPlayer, gameBoard);
-      let { newLastTurns, winner } = changePrevTurns([...prevTurns], founIndexes, square.color);
+      const { square, founIndexes: foundIndexes } = checkForAlign(rowIndex, colIndex, curPlayer, gameBoard);
+      let { newLastTurns, winner } = changePrevTurns([...prevTurns], foundIndexes, square.color);
       if (winner) {
-        hasWinner(winner);
+        // hasWinner(winner);
+        setWinner(winner);
       }
       const copyTurn = [
         {
@@ -200,8 +204,8 @@ function App() {
   }
   function handleRestart() {
     InitilizePoints();
-    setGameTurns([]);
-    Winner = null;
+    setGameTurnState([]);
+    winner = null;
   }
   return (
     <>
@@ -227,9 +231,9 @@ function App() {
               isActive={activePlayer === 'T'}
             />
           </ol>
-          {(Winner || hasEnd) && (
+          {(winner || hasEnd) && (
             <GameOver
-              winner={Winner}
+              winner={winner}
               onRestart={handleRestart}
             />
           )}
@@ -237,7 +241,7 @@ function App() {
             onSelectSquare={handleSelectSquare}
             activePlayerSymbol={activePlayer}
             board={gameBoard}
-            turns={gameTurns}
+            turns={gameTurnState}
           />
           <button
             id="restart-button"
@@ -246,7 +250,7 @@ function App() {
             Restart
           </button>
         </div>
-        {IS_LOG_ENABLED && <Log logs={gameTurns} />}
+        {IS_LOG_ENABLED && <Log logs={gameTurnState} />}
       </main>
     </>
   );
